@@ -27,6 +27,10 @@ export default class GDHalfHourList extends React.Component {
         };
     }
 
+    static defaultProps = {
+        removeModal: {}
+    }
+
     renderMidItem(){
         return(
             <Text style={styles.midNavStyle}> 近半小时热门 </Text>
@@ -34,8 +38,9 @@ export default class GDHalfHourList extends React.Component {
     }
 
     renderRightItem(){
+        //()=>this.props.navigation.goBack()
         return(
-            <TouchableOpacity onPress={()=>this.props.navigation.goBack()}>
+            <TouchableOpacity onPress={() => {this.props.removeModal(false)}}>
                 <Text style={styles.rightNavStyle}> 关闭 </Text>
             </TouchableOpacity>
         );

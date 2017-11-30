@@ -8,6 +8,7 @@ import GDHourList from './appClass/hourList/GDHoutList';
 import GDHalfHourList from './appClass/halfHour/GDHalfHourList';
 import GDSearch from './appClass/search/GDSearch';
 import GDLaunchPage from './appClass/common/GDLaunchPage';
+import GDDetailPage from './appClass/common/GDDetailPage';
 
 // import Main from './appClass/MainScreen'
 // import profile from './appClass/ProfileScreen'
@@ -123,6 +124,9 @@ const App = StackNavigator(
         },
         GDSearch:{
             screen: GDSearch,
+        },
+        GDDetailPage:{
+            screen: GDDetailPage,
         },
     },
     {

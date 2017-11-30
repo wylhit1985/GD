@@ -7,7 +7,9 @@ import {
     StyleSheet,
     TouchableOpacity,
     FlatList,
-    Dimensions
+    Dimensions,
+    Modal,
+    AsyncStorage
 } from 'react-native';
 
 import GDCommonNavBar from '../common/GDCommonNavBar';
@@ -16,6 +18,7 @@ import GDSearch from '../search/GDSearch';
 import GDHotCell from '../common/GDHotCell';
 import GDNoDataView from '../common/GDNoDataView';
 import HTTPBase from '../http/HTTPBase';
+import GDDetailPage from '../common/GDDetailPage';
 
 const {width, height} = Dimensions.get('window')
 
@@ -37,11 +40,17 @@ export default class GDHome extends React.Component {
             dataSource: [],
             loaded: false,
             isRefreshing: false,
+            isModal: false,
+            lastID: 0,
         };
     }
 
     pushToHalfHourList(){
-        this.props.navigation.navigate('GDHalfHourList');
+        // this.props.navigation.navigate('GDHalfHourList');
+
+        this.setState({
+            isModal: true
+        })
     }
 
     pushSearch(){
@@ -56,9 +65,15 @@ export default class GDHome extends React.Component {
         );
     };
 
+    showID(){
+        AsyncStorage.getItem("lastID").then((value) =>{
+            alert(value);
+        })
+    }
+
     renderMidItem(){
         return(
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => {this.showID()}}>
                 <Image source = {require('../../assest/navtitle_home_down_66x20.png')} style={styles.midNavStyle}/>
             </TouchableOpacity>
         );
@@ -73,64 +88,79 @@ export default class GDHome extends React.Component {
     }
 
     fetchData = ()=>{
-        let params = {"count" : 25};
+        alert('fetchData');
+        let params = {"count" : 10};
 
-        HTTPBase.post('http://guangdiu.com/api/getlist.php',params,{})
+        HTTPBase.post('https://guangdiu.com/api/getlist.php',params,{})
             .then((responseData) => {
+                // this.dataSource = this.state.dataSource.concat(responseData.data);
+
                 this.setState({
-                    dataSource:responseData.data.slice(0),
+                    dataSource: responseData.data.slice(0),
                     loaded: true,
                     isRefreshing: false,
                 })
+
+                console.log(this.state.dataSource);
+
+                lastID = responseData.data[responseData.data.length - 1].id;
+                AsyncStorage.setItem("lastID", lastID.toString());
+                console.log(lastID);
             }).catch((error)=>{alert(error);}).done();
+    }
 
-
-        // let formData = new FormData();
-        // formData.append("count",30);
-        // formData.append("mall","京东商城")
-        //
-        // fetch('http://guangdiu.com/api/getlist.php',{
-        //     method: 'POST',
-        //     header: {},
-        //     body: formData,
-        // })
-        //     .then((response) => response.json())
-        //     .then((responseData) => {
-        //         this.setState({
-        //             dataSource:responseData.data.slice(0),
-        //             loaded: true,
-        //             isRefreshing: false,
-        //         })
-        //     }).catch((error)=>{alert(error);}).done();
+    _openDetail = (value) => {
+        this.props.navigation.navigate('GDDetailPage', {url: 'http://guangdiu.com/go.php' + '?' + 'id=' + value});
     }
 
     _renderItem = (rowData) => {
         return (
-            <GDHotCell
-                image={rowData.item.image}
-                title={rowData.item.title}/>
+            <TouchableOpacity onPress={() => {
+                this._openDetail(rowData.item.id)
+            }}>
+                <GDHotCell
+                    image={rowData.item.image}
+                    title={rowData.item.title}
+                />
+            </TouchableOpacity>
         );
     }
     _refresh = ()=>{
         // this.setState({
         //     isRefreshing: true,
         // });
+        alert('_refresh');
         this.fetchData();
     }
 
     _loadMore = ()=>{
-        // this.fetchData();
         alert('_loadMore');
-        fetch('http://guangdiu.com/api/gethots.php')
-            .then((response) => response.json())
-            .then((responseData) => {
-                this.setState({
-                    dataSource:responseData.data.slice(0),
-                    loaded: true,
-                    isRefreshing: false,
-                })
-            }).catch((error)=>{alert(error);}).done();
+        //读取id
+        AsyncStorage.getItem("lastID").then((value) =>{
+
+            let params = {
+                "count" : 10,
+                "sinceid" : value};
+
+            console.log('加载更多');
+            console.log(value);
+
+            HTTPBase.post('https://guangdiu.com/api/getlist.php',params,{})
+                .then((responseData) => {
+                    this.dataSource = this.state.dataSource.concat(responseData.data);
+                    this.setState({
+                        // dataSource:responseData.data.slice(0),
+                        loaded: true,
+                        isRefreshing: false,
+                    })
+
+                    let lastID = responseData.data[responseData.data.length - 1].id;
+                    AsyncStorage.setItem("lastID", lastID.toString());
+                    // console.log(responseData.data);
+                }).catch((error)=>{alert(error);}).done();
+        })
     }
+
     renderView(){
         if(this.state.loaded === false){
             return(
@@ -146,7 +176,7 @@ export default class GDHome extends React.Component {
                     onRefresh = {this._refresh}
                     refreshing = {false}
                     ListEmptyComponent = {<GDNoDataView infoText = '加载失败，请重试' style={styles.noData}/>}
-                    onEndReachedThreshold={0.1}
+                    onEndReachedThreshold={0.2}
                     onEndReached={this._loadMore}
                 >
                 </FlatList>
@@ -166,9 +196,29 @@ export default class GDHome extends React.Component {
         this.timer && clearTimeout(this.timer);
     }
 
+    onRequestClose(){
+        this.setState({
+            isModal: false
+        })
+    }
+
+    closeModal(data){
+        this.setState({
+            isModal: data
+        })
+    }
+
     render() {
         return (
             <View style = {styles.container} >
+                <Modal
+                    animationType = 'slide'
+                    transparent= {false}
+                    visible= {this.state.isModal}
+                    onRequestClose={() => this.onRequestClose()}
+                >
+                    <GDHalfHourList removeModal = {(data) => this.closeModal(data)}/>
+                </Modal>
                 <GDCommonNavBar leftItem={()=>this.renderLeftItem()}
                                 midItem={()=>this.renderMidItem()}
                                 rightItem={()=>this.renderRightItem()}
