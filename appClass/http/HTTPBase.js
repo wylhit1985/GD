@@ -77,3 +77,5 @@ export default class HTTPBase{
         });
     }
 }
+
+global.HTTPBase = HTTPBase;

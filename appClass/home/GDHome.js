@@ -12,28 +12,26 @@ import {
     AsyncStorage
 } from 'react-native';
 
+import ReactPropTypes from 'prop-types';
+
 import GDCommonNavBar from '../common/GDCommonNavBar';
-import GDHalfHourList from '../halfHour/GDHalfHourList';
+import GDHalfHourList from './GDHalfHourList';
 import GDSearch from '../search/GDSearch';
 import GDHotCell from '../common/GDHotCell';
 import GDNoDataView from '../common/GDNoDataView';
-import HTTPBase from '../http/HTTPBase';
+import HTTP from '../http/HTTPBase';
 import GDDetailPage from '../common/GDDetailPage';
+import GDBadge from '../common/GDBadge';
+import RealmStorage from '../storage/RealmStorage';
 
 const {width, height} = Dimensions.get('window')
 
 export default class GDHome extends React.Component {
-    static navigationOptions = {
-        tabBarLabel: '首页',
-        // Note: By default the icon is only shown on iOS. Search the showIcon option below.
-        tabBarIcon: ({ tintColor }) => (
-            <Image
-                source={require('../../assest/tabbar_home_30x30.png')}
-                style={[styles.icon, {tintColor: tintColor}]}
-            />
-        ),
-    };
-
+    _renderBadge = ()=>{
+        return(
+            <GDBadge num={this.state.badgeNum}/>
+        );
+    }
     constructor(props){
         super(props);
         this.state = {
@@ -41,16 +39,43 @@ export default class GDHome extends React.Component {
             loaded: false,
             isRefreshing: false,
             isModal: false,
-            lastID: 0,
+            cnlastID: 0,
+            num: 33
         };
     }
 
-    pushToHalfHourList(){
-        // this.props.navigation.navigate('GDHalfHourList');
+    static propTypes = {
+        badgeNum:ReactPropTypes.number
+    };
+    static defaultProps = {
+        badgeNum:10
+    }
+    static navigationOptions = {
+        tabBarLabel: '首页',
+        tabBarIcon: ({ tintColor }) => (
+            <View>
+                <Image
+                    source={require('../../assest/tabbar_home_30x30.png')}
+                    style={[styles.icon, {tintColor: tintColor}]}
+                >
+                </Image>
+                <Text style={[styles.badgeText, {color: tintColor}]}>{this.state.num}</Text>
+            </View>
+        ),
+    };
 
-        this.setState({
-            isModal: true
-        })
+
+
+// <GDBadge num={99}/>
+// {/*<View style={styles.badgeColor} ></View>*/}
+
+
+    pushToHalfHourList(){
+        this.props.navigation.navigate('GDHalfHourList');
+
+        // this.setState({
+        //     isModal: true
+        // })
     }
 
     pushSearch(){
@@ -66,7 +91,7 @@ export default class GDHome extends React.Component {
     };
 
     showID(){
-        AsyncStorage.getItem("lastID").then((value) =>{
+        AsyncStorage.getItem("cnlastID").then((value) =>{
             alert(value);
         })
     }
@@ -93,7 +118,7 @@ export default class GDHome extends React.Component {
 
         HTTPBase.post('https://guangdiu.com/api/getlist.php',params,{})
             .then((responseData) => {
-                // this.dataSource = this.state.dataSource.concat(responseData.data);
+                this.dataSource = [];
 
                 this.setState({
                     dataSource: responseData.data.slice(0),
@@ -103,9 +128,9 @@ export default class GDHome extends React.Component {
 
                 console.log(this.state.dataSource);
 
-                lastID = responseData.data[responseData.data.length - 1].id;
-                AsyncStorage.setItem("lastID", lastID.toString());
-                console.log(lastID);
+                cnlastID = responseData.data[responseData.data.length - 1].id;
+                AsyncStorage.setItem("cnlastID", cnlastID.toString());
+                console.log(cnlastID);
             }).catch((error)=>{alert(error);}).done();
     }
 
@@ -136,7 +161,7 @@ export default class GDHome extends React.Component {
     _loadMore = ()=>{
         alert('_loadMore');
         //读取id
-        AsyncStorage.getItem("lastID").then((value) =>{
+        AsyncStorage.getItem("cnlastID").then((value) =>{
 
             let params = {
                 "count" : 10,
@@ -154,8 +179,8 @@ export default class GDHome extends React.Component {
                         isRefreshing: false,
                     })
 
-                    let lastID = responseData.data[responseData.data.length - 1].id;
-                    AsyncStorage.setItem("lastID", lastID.toString());
+                    let cnlastID = responseData.data[responseData.data.length - 1].id;
+                    AsyncStorage.setItem("cnlastID", cnlastID.toString());
                     // console.log(responseData.data);
                 }).catch((error)=>{alert(error);}).done();
         })
@@ -168,6 +193,7 @@ export default class GDHome extends React.Component {
             );
         }else{
             return(
+                <View>
                 <FlatList
                     data={this.state.dataSource}
                     keyExtractor = {(item,index) => item.id}
@@ -180,6 +206,10 @@ export default class GDHome extends React.Component {
                     onEndReached={this._loadMore}
                 >
                 </FlatList>
+            {
+                this._renderBadge()
+            }
+                </View>
             );
         }
     }
@@ -211,14 +241,14 @@ export default class GDHome extends React.Component {
     render() {
         return (
             <View style = {styles.container} >
-                <Modal
-                    animationType = 'slide'
-                    transparent= {false}
-                    visible= {this.state.isModal}
-                    onRequestClose={() => this.onRequestClose()}
-                >
-                    <GDHalfHourList removeModal = {(data) => this.closeModal(data)}/>
-                </Modal>
+                {/*<Modal*/}
+                    {/*animationType = 'slide'*/}
+                    {/*transparent= {false}*/}
+                    {/*visible= {this.state.isModal}*/}
+                    {/*onRequestClose={() => this.onRequestClose()}*/}
+                {/*>*/}
+                    {/*<GDHalfHourList removeModal = {(data) => this.closeModal(data)}/>*/}
+                {/*</Modal>*/}
                 <GDCommonNavBar leftItem={()=>this.renderLeftItem()}
                                 midItem={()=>this.renderMidItem()}
                                 rightItem={()=>this.renderRightItem()}
@@ -239,8 +269,34 @@ const styles = StyleSheet.create({
         backgroundColor: '#95e9de',
     },
     icon: {
+        top:5,
         width: 26,
         height: 26,
+    },
+    icon2: {
+        position:'absolute',
+        top:5,
+        width: 9,
+        height: 9,
+    },
+    badgeStyle: {
+        // position:'absolute',
+        // top:2,
+        // left:20
+    },
+    badgeColor: {
+        position:'absolute',
+        top:2,
+        left:20,
+        backgroundColor: '#2489e9',
+        borderRadius:3,
+        width: 15,
+        height: 13,
+    },
+    badgeText: {
+        position:'absolute',
+        top:0,
+        left:20,
     },
     leftNavStyle: {
         width: 20,

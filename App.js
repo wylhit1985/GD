@@ -5,10 +5,11 @@ import { StackNavigator, TabNavigator } from 'react-navigation';
 import GDHome from './appClass/home/GDHome';
 import GDHt from './appClass/ht/GDHt';
 import GDHourList from './appClass/hourList/GDHoutList';
-import GDHalfHourList from './appClass/halfHour/GDHalfHourList';
+import GDHalfHourList from './appClass/home/GDHalfHourList';
 import GDSearch from './appClass/search/GDSearch';
 import GDLaunchPage from './appClass/common/GDLaunchPage';
 import GDDetailPage from './appClass/common/GDDetailPage';
+import GDUSHalfHourList from './appClass/ht/GDUSHalfHourList';
 
 // import Main from './appClass/MainScreen'
 // import profile from './appClass/ProfileScreen'
@@ -121,6 +122,9 @@ const App = StackNavigator(
         },
         GDHalfHourList:{
             screen: GDHalfHourList,
+        },
+        GDUSHalfHourList:{
+            screen: GDUSHalfHourList,
         },
         GDSearch:{
             screen: GDSearch,

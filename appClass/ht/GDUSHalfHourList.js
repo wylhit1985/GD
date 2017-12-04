@@ -14,10 +14,11 @@ import GDCommonNavBar from '../common/GDCommonNavBar';
 import GDHotCell from '../common/GDHotCell';
 import GDNoDataView from '../common/GDNoDataView';
 import HTTPBase from '../http/HTTPBase';
+import GDDetailPage from '../common/GDDetailPage';
 
 const {width, height} = Dimensions.get('window')
 
-export default class GDHalfHourList extends React.Component {
+export default class GDUSHalfHourList extends React.Component {
     constructor(props){
         super(props);
         this.state = {
@@ -47,8 +48,10 @@ export default class GDHalfHourList extends React.Component {
     }
 
     fetchData = ()=>{
-
-        HTTPBase.get('http://guangdiu.com/api/gethots.php')
+        let params = {
+            "c" : "us"
+        };
+        HTTPBase.get('http://guangdiu.com/api/gethots.php', params)
             .then((responseData) => {
                 this.setState({
                     dataSource:responseData.data.slice(0),
@@ -75,12 +78,20 @@ export default class GDHalfHourList extends React.Component {
             </View>
         );
     }
+    _openDetail = (value) => {
+        this.props.navigation.navigate('GDDetailPage', {url: 'http://guangdiu.com/go.php' + '?' + 'id=' + value});
+    }
 
     _renderItem = (rowData) => {
         return (
-            <GDHotCell
-                image={rowData.item.image}
-                title={rowData.item.title}/>
+            <TouchableOpacity onPress={() => {
+                this._openDetail(rowData.item.id)
+            }}>
+                <GDHotCell
+                    image={rowData.item.image}
+                    title={rowData.item.title}
+                />
+            </TouchableOpacity>
         );
     }
 
@@ -123,7 +134,7 @@ export default class GDHalfHourList extends React.Component {
         this.timer = setTimeout(
             ()=>{
                 this.fetchData();
-                },
+            },
             1000,
         );
     }
