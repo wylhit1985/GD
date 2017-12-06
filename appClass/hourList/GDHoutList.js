@@ -37,8 +37,14 @@ export default class GDHoutList extends React.Component {
             dataSource: [],
             loaded: false,
             isRefreshing: false,
-            num: 33
+            num: 33,
+            prompt:""
         };
+        this.lasthourhour = '';
+        this.lasthourdate = '';
+        this.nexthourhour = '';
+        this.nexthourdate = '';
+
     }
 
     static propTypes = {
@@ -68,7 +74,38 @@ export default class GDHoutList extends React.Component {
 
     pushSetting(){
         // this.props.navigation.navigate('GDSearch');
+
+
+        alert(curDate);
     }
+
+    getCurDate = ()=>{
+        let date = new Date();
+
+        let year = date.getFullYear() + "";
+        let month = date.getMonth() + 1;    //注意，java和js中月份从 0 开始
+        let day = date.getDate();
+
+        if(month >=1 && month <= 9){
+            month = "0" + month;
+        }else{
+            month += "";
+        }
+
+        if(day >=1 && day <= 9){
+            day = "0" + day;
+        }else{
+            day += "";
+        }
+
+        // alert(year);
+        // alert(month);
+        // alert(day);
+        let curDate = year + month + day;
+
+        return curDate;
+    }
+
 
     renderMidItem(){
         return(
@@ -84,9 +121,47 @@ export default class GDHoutList extends React.Component {
         );
     }
 
-    fetchData = ()=>{
-        alert('fetchData');
+    fetchData = (date,hour)=>{
+        // 初始化参数对象
         let params = {};
+
+        if (date) {     // 时间有值时
+            params = {
+                "date" : date,
+                "hour" : hour
+            }
+        }
+
+        HTTPBase.post('https://guangdiu.com/api/getranklist.php',params,{})
+            .then((responseData) => {
+                this.dataSource = [];
+
+                this.setState({
+                    dataSource: responseData.data.slice(0),
+                    loaded: true,
+                    isRefreshing: false,
+                    prompt:responseData.displaydate + responseData.rankhour + '点档' + '(' + responseData.rankduring + ')'
+                })
+
+                this.lasthourhour = responseData.lasthourhour;
+                this.lasthourdate = responseData.lasthourdate;
+                this.nexthourhour = responseData.nexthourhour;
+                this.nexthourdate = responseData.nexthourdate;
+
+                // alert(this.lasthourhour);
+                // alert(this.lasthourdate);
+            }).catch((error)=>{
+            alert(error);
+        }).done();
+    }
+
+    //根据时间加载数据
+    dataFromTime(hour,date){
+
+        let params = {
+            "date":date,
+            "hour":hour
+        };
 
         HTTPBase.post('https://guangdiu.com/api/getranklist.php',params,{})
             .then((responseData) => {
@@ -97,25 +172,28 @@ export default class GDHoutList extends React.Component {
                     loaded: true,
                     isRefreshing: false,
                 })
-
-                console.log(this.state.dataSource);
-
-                cnlastID = responseData.data[responseData.data.length - 1].id;
-                AsyncStorage.setItem("cnlastID", cnlastID.toString());
-                console.log(cnlastID);
-
-                RealmStorage.create('HomeData',responseData.date = {});
             }).catch((error)=>{
-            // alert(error);
-            this.dataSource = RealmStorage.loadAll('HomeData');
-
-            this.setState({
-                dataSource: responseData.data.slice(0),
-                loaded: true,
-                isRefreshing: false,
-            })
-
+            alert(error);
         }).done();
+    }
+
+
+    pressLastHour = ()=>{
+        this.fetchData(this.lasthourdate,this.lasthourhour);
+        // let hour = this.nowHour - 1;
+        //
+        // this.dataFromTime(hour,this.getCurDate());
+        //
+        // this.nowHour = hour;
+    }
+
+    pressNextHour = ()=>{
+        this.fetchData(this.nexthourdate,this.nexthourhour);
+        // let hour = this.nowHour + 1;
+        //
+        // this.dataFromTime(hour,this.getCurDate());
+        //
+        // this.nowHour = hour;
     }
 
     _openDetail = (value) => {
@@ -179,6 +257,7 @@ export default class GDHoutList extends React.Component {
         }
     }
     componentDidMount() {
+
         this.timer = setTimeout(
             ()=>{
                 this.fetchData();
@@ -200,7 +279,7 @@ export default class GDHoutList extends React.Component {
 
                 {/*头部标题*/}
                 <View style={styles.promptStyle}>
-                    <Text>提示栏</Text>
+                    <Text>{this.state.prompt}</Text>
                 </View>
 
                 {
@@ -209,11 +288,11 @@ export default class GDHoutList extends React.Component {
 
                 {/*底部操作按钮*/}
                 <View style={styles.operationStyle}>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={this.pressLastHour}>
                         <Text style={{marginRight:10,fontSize:17,color:'green'}}>{"< 上一小时"}</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={this.pressNextHour}>
                         <Text style={{marginRight:10,fontSize:17,color:'green'}}>{"下一小时 >"}</Text>
                     </TouchableOpacity>
                 </View>

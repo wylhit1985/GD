@@ -81,7 +81,6 @@ export default class GDHt extends React.Component {
     }
 
     fetchData = ()=>{
-        alert('海淘  fetchData');
         let params = {
             "count" : 10,
             "country" : "us"
@@ -130,7 +129,6 @@ export default class GDHt extends React.Component {
     }
 
     _loadMore = ()=>{
-        alert('_loadMore');
         //读取id
         AsyncStorage.getItem("uslastID").then((value) =>{
 

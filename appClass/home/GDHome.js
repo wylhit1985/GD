@@ -19,7 +19,6 @@ import GDHalfHourList from './GDHalfHourList';
 import GDSearch from '../search/GDSearch';
 import GDHomeCell from '../common/GDHomeCell';
 import GDNoDataView from '../common/GDNoDataView';
-import HTTP from '../http/HTTPBase';
 import GDDetailPage from '../common/GDDetailPage';
 import GDBadge from '../common/GDBadge';
 import RealmStorage from '../storage/RealmStorage';
@@ -113,7 +112,6 @@ export default class GDHome extends React.Component {
     }
 
     fetchData = ()=>{
-        alert('fetchData');
         let params = {"count" : 10};
 
         HTTPBase.post('https://guangdiu.com/api/getlist.php',params,{})
@@ -174,7 +172,6 @@ export default class GDHome extends React.Component {
     }
 
     _loadMore = ()=>{
-        alert('_loadMore');
         //读取id
         AsyncStorage.getItem("cnlastID").then((value) =>{
 
