@@ -97,11 +97,11 @@ const tabView = TabNavigator(
         GDHome: {
             screen: GDHome,
         },
-        GDHourList: {
-            screen: GDHourList,
-        },
         GDHt: {
             screen: GDHt,
+        },
+        GDHourList: {
+            screen: GDHourList,
         },
     },
     {

@@ -17,7 +17,7 @@ import ReactPropTypes from 'prop-types';
 import GDCommonNavBar from '../common/GDCommonNavBar';
 import GDHalfHourList from './GDHalfHourList';
 import GDSearch from '../search/GDSearch';
-import GDHotCell from '../common/GDHotCell';
+import GDHomeCell from '../common/GDHomeCell';
 import GDNoDataView from '../common/GDNoDataView';
 import HTTP from '../http/HTTPBase';
 import GDDetailPage from '../common/GDDetailPage';
@@ -59,7 +59,7 @@ export default class GDHome extends React.Component {
                     style={[styles.icon, {tintColor: tintColor}]}
                 >
                 </Image>
-                <Text style={[styles.badgeText, {color: tintColor}]}>{this.state.num}</Text>
+                <Text style={[styles.badgeText, {color: tintColor}]}>23</Text>
             </View>
         ),
     };
@@ -131,7 +131,19 @@ export default class GDHome extends React.Component {
                 cnlastID = responseData.data[responseData.data.length - 1].id;
                 AsyncStorage.setItem("cnlastID", cnlastID.toString());
                 console.log(cnlastID);
-            }).catch((error)=>{alert(error);}).done();
+
+                RealmStorage.create('HomeData',responseData.date = {});
+            }).catch((error)=>{
+            // alert(error);
+            this.dataSource = RealmStorage.loadAll('HomeData');
+
+            this.setState({
+                dataSource: responseData.data.slice(0),
+                loaded: true,
+                isRefreshing: false,
+            })
+
+        }).done();
     }
 
     _openDetail = (value) => {
@@ -143,9 +155,12 @@ export default class GDHome extends React.Component {
             <TouchableOpacity onPress={() => {
                 this._openDetail(rowData.item.id)
             }}>
-                <GDHotCell
+                <GDHomeCell
                     image={rowData.item.image}
                     title={rowData.item.title}
+                    mall={rowData.item.mall}
+                    pubTime={rowData.item.pubtime}
+                    fromSite={rowData.item.fromsite}
                 />
             </TouchableOpacity>
         );
@@ -198,7 +213,6 @@ export default class GDHome extends React.Component {
                     data={this.state.dataSource}
                     keyExtractor = {(item,index) => item.id}
                     renderItem = {this._renderItem}
-                    ListHeaderComponent = {this._renderHeader}
                     onRefresh = {this._refresh}
                     refreshing = {false}
                     ListEmptyComponent = {<GDNoDataView infoText = '加载失败，请重试' style={styles.noData}/>}

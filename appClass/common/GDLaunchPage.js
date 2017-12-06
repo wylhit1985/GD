@@ -30,7 +30,7 @@ export default class GDLaunchPage extends React.Component{
         // SplashScreen.hide();
         this.timer = setTimeout(() => {
             this.props.navigation.navigate('tabView');
-        },1500)
+        },500)
     }
 
     componentWillUnmount() {
