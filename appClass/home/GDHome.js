@@ -9,7 +9,8 @@ import {
     FlatList,
     Dimensions,
     Modal,
-    AsyncStorage
+    AsyncStorage,
+    DeviceEventEmitter
 } from 'react-native';
 
 import ReactPropTypes from 'prop-types';
@@ -21,16 +22,17 @@ import GDHomeCell from '../common/GDHomeCell';
 import GDNoDataView from '../common/GDNoDataView';
 import GDDetailPage from '../common/GDDetailPage';
 import GDBadge from '../common/GDBadge';
+import TabBadge from '../common/TabBadge';
 import RealmStorage from '../storage/RealmStorage';
+import GDSiftMenu from '../common/GDSiftMenu';
+
+import HomeSiftData from '../data/HomeSiftData.json';
 
 const {width, height} = Dimensions.get('window')
 
+
 export default class GDHome extends React.Component {
-    _renderBadge = ()=>{
-        return(
-            <GDBadge num={this.state.badgeNum}/>
-        );
-    }
+
     constructor(props){
         super(props);
         this.state = {
@@ -38,8 +40,9 @@ export default class GDHome extends React.Component {
             loaded: false,
             isRefreshing: false,
             isModal: false,
+            isSiftModal: false,
             cnlastID: 0,
-            num: 33
+            homeBadgeNum: 100
         };
     }
 
@@ -51,15 +54,17 @@ export default class GDHome extends React.Component {
     }
     static navigationOptions = {
         tabBarLabel: '首页',
-        tabBarIcon: ({ tintColor }) => (
+        tabBarIcon: ({ tintColor,focused }) => (
+
             <View>
                 <Image
-                    source={require('../../assest/tabbar_home_30x30.png')}
+                    source={{uri:'tabbar_home_30x30'}}
                     style={[styles.icon, {tintColor: tintColor}]}
                 >
                 </Image>
-                <Text style={[styles.badgeText, {color: tintColor}]}>23</Text>
+                <TabBadge tabType={0} focused={focused}/>
             </View>
+
         ),
     };
 
@@ -94,10 +99,16 @@ export default class GDHome extends React.Component {
             alert(value);
         })
     }
+    //显示筛选菜单
+    showSiftMenu = ()=>{
+        this.setState({
+            isSiftModal: true,
+        })
+    }
 
     renderMidItem(){
         return(
-            <TouchableOpacity onPress={() => {this.showID()}}>
+            <TouchableOpacity onPress={() => {this.showSiftMenu()}}>
                 <Image source = {require('../../assest/navtitle_home_down_66x20.png')} style={styles.midNavStyle}/>
             </TouchableOpacity>
         );
@@ -114,8 +125,11 @@ export default class GDHome extends React.Component {
     fetchData = ()=>{
         let params = {"count" : 10};
 
+
         HTTPBase.post('https://guangdiu.com/api/getlist.php',params,{})
             .then((responseData) => {
+
+                DeviceEventEmitter.emit('homeBadge',this.state.homeBadgeNum--);
                 this.dataSource = [];
 
                 this.setState({
@@ -133,13 +147,13 @@ export default class GDHome extends React.Component {
                 RealmStorage.create('HomeData',responseData.date = {});
             }).catch((error)=>{
             // alert(error);
-            this.dataSource = RealmStorage.loadAll('HomeData');
-
-            this.setState({
-                dataSource: responseData.data.slice(0),
-                loaded: true,
-                isRefreshing: false,
-            })
+            // this.dataSource = RealmStorage.loadAll('HomeData');
+            //
+            // this.setState({
+            //     dataSource: responseData.data.slice(0),
+            //     loaded: true,
+            //     isRefreshing: false,
+            // })
 
         }).done();
     }
@@ -167,8 +181,49 @@ export default class GDHome extends React.Component {
         // this.setState({
         //     isRefreshing: true,
         // });
-        alert('_refresh');
+        // alert('_refresh');
         this.fetchData();
+    }
+
+
+    // 加载筛选数据网络请求
+    loadSiftData = (mall, cate) => {
+
+        // 初始化参数对象
+        let params = {};
+
+        if (mall === "" && cate === "") {   // 全部
+            this.loadData(undefined);
+            return;
+        }
+
+        if (mall === "") {  // cate 有值
+            params = {
+                "cate" : cate
+            };
+        }else {
+            params = {
+                "mall" : mall
+            };
+        }
+
+        // 筛选请求
+        HTTPBase.get('https://guangdiu.com/api/getlist.php', params)
+            .then((responseData) => {
+                // 重新渲染
+                this.setState({
+                    dataSource: responseData.data.slice(0),
+                    loaded:true,
+                });
+
+                // 存储数组中最后一个元素的id
+                let cnlastID = responseData.data[responseData.data.length - 1].id;
+                AsyncStorage.setItem('cnlastID', cnlastID.toString());
+
+            })
+            .catch((error) => {
+                // 网络等问题处理
+            })
     }
 
     _loadMore = ()=>{
@@ -217,9 +272,6 @@ export default class GDHome extends React.Component {
                     onEndReached={this._loadMore}
                 >
                 </FlatList>
-            {
-                this._renderBadge()
-            }
                 </View>
             );
         }
@@ -239,19 +291,22 @@ export default class GDHome extends React.Component {
 
     onRequestClose(){
         this.setState({
-            isModal: false
+            isModal: false,
+            isSiftModal: false,
         })
     }
 
     closeModal(data){
         this.setState({
-            isModal: data
+            isModal: data,
+            isSiftModal: data,
         })
     }
 
     render() {
         return (
             <View style = {styles.container} >
+                {/*初始化近半小时热门*/}
                 {/*<Modal*/}
                     {/*animationType = 'slide'*/}
                     {/*transparent= {false}*/}
@@ -260,6 +315,18 @@ export default class GDHome extends React.Component {
                 {/*>*/}
                     {/*<GDHalfHourList removeModal = {(data) => this.closeModal(data)}/>*/}
                 {/*</Modal>*/}
+
+                {/*初始化筛选菜单*/}
+                <Modal animationType = 'none'
+                       transparent= {true}
+                       visible= {this.state.isSiftModal}
+                       onRequestClose={() => this.onRequestClose()}
+                >
+                    <GDSiftMenu removeModal={(data) => this.closeModal(data)}
+                                data={HomeSiftData}
+                                loadSiftData={(mall, cate) => this.loadSiftData(mall, cate)} />
+                </Modal>
+
                 <GDCommonNavBar leftItem={()=>this.renderLeftItem()}
                                 midItem={()=>this.renderMidItem()}
                                 rightItem={()=>this.renderRightItem()}

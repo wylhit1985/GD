@@ -21,6 +21,7 @@ import GDHomeCell from '../common/GDHomeCell';
 import GDNoDataView from '../common/GDNoDataView';
 import GDDetailPage from '../common/GDDetailPage';
 import GDBadge from '../common/GDBadge';
+import GDSettings from './GDSettings';
 import RealmStorage from '../storage/RealmStorage';
 
 const {width, height} = Dimensions.get('window')
@@ -38,7 +39,8 @@ export default class GDHoutList extends React.Component {
             loaded: false,
             isRefreshing: false,
             num: 33,
-            prompt:""
+            prompt:"",
+            disNextTouch:false   // 下一小时按钮状态
         };
         this.lasthourhour = '';
         this.lasthourdate = '';
@@ -62,7 +64,6 @@ export default class GDHoutList extends React.Component {
                     style={[styles.icon, {tintColor: tintColor}]}
                 >
                 </Image>
-                <Text style={[styles.badgeText, {color: tintColor}]}>23</Text>
             </View>
         ),
     };
@@ -73,10 +74,10 @@ export default class GDHoutList extends React.Component {
 // {/*<View style={styles.badgeColor} ></View>*/}
 
     pushSetting(){
-        // this.props.navigation.navigate('GDSearch');
+        this.props.navigation.navigate('GDSettings');
 
 
-        alert(curDate);
+        // alert(curDate);
     }
 
     getCurDate = ()=>{
@@ -134,13 +135,24 @@ export default class GDHoutList extends React.Component {
 
         HTTPBase.post('https://guangdiu.com/api/getranklist.php',params,{})
             .then((responseData) => {
+
+                let disNextTouch = true;
+
+                if (responseData.hasnexthour == 1) {    // hasnexthour为0时 下一小时按钮，不可点击
+                    disNextTouch = false;
+                }
+
+                console.log(responseData.hasnexthour);
+                console.log('this.state.disNextTouch = ',this.state.disNextTouch);
+
                 this.dataSource = [];
 
                 this.setState({
                     dataSource: responseData.data.slice(0),
                     loaded: true,
                     isRefreshing: false,
-                    prompt:responseData.displaydate + responseData.rankhour + '点档' + '(' + responseData.rankduring + ')'
+                    prompt:responseData.displaydate + responseData.rankhour + '点档' + '(' + responseData.rankduring + ')',
+                    disNextTouch:disNextTouch,    // 更新按钮状态
                 })
 
                 this.lasthourhour = responseData.lasthourhour;
@@ -227,7 +239,7 @@ export default class GDHoutList extends React.Component {
         let top = Platform.OS === 'ios' ? 54 : 44;
         let title = 44;
         let bottom = 44;
-        let tabH = 34;
+        let tabH = 44;
         let h = height - top - title - bottom - tabH;
         return h;
     }
@@ -249,9 +261,6 @@ export default class GDHoutList extends React.Component {
                         ListEmptyComponent = {<GDNoDataView infoText = '加载失败，请重试' style={styles.noData}/>}
                     >
                     </FlatList>
-                    {
-                        this._renderBadge()
-                    }
                 </View>
             );
         }
@@ -292,10 +301,16 @@ export default class GDHoutList extends React.Component {
                         <Text style={{marginRight:10,fontSize:17,color:'green'}}>{"< 上一小时"}</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={this.pressNextHour}>
-                        <Text style={{marginRight:10,fontSize:17,color:'green'}}>{"下一小时 >"}</Text>
+                    <TouchableOpacity
+                        onPress={this.pressNextHour}
+                        disabled={this.state.disNextTouch}>
+                        <Text style={{marginRight:10,fontSize:17,color:this.state.disNextTouch == false ? 'green' : 'gray'}}>{"下一小时 >"}</Text>
                     </TouchableOpacity>
                 </View>
+
+                {
+                    this._renderBadge()
+                }
             </View>
         );
     }
@@ -331,7 +346,7 @@ const styles = StyleSheet.create({
     },
     operationStyle:{
         width:width,
-        // height:44,
+        height:44,
         flexDirection:'row',
         justifyContent:'center',
         alignItems:'center',

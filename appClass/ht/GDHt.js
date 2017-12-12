@@ -9,7 +9,8 @@ import {
     FlatList,
     Dimensions,
     Modal,
-    AsyncStorage
+    AsyncStorage,
+    DeviceEventEmitter
 } from 'react-native';
 
 import GDCommonNavBar from '../common/GDCommonNavBar';
@@ -18,7 +19,11 @@ import GDSearch from '../search/GDSearch';
 import GDHotCell from '../common/GDHotCell';
 import GDNoDataView from '../common/GDNoDataView';
 import HTTPBase from '../http/HTTPBase';
+import TabBadge from '../common/TabBadge';
 import GDDetailPage from '../common/GDDetailPage';
+import GDSiftMenu from '../common/GDSiftMenu';
+
+import HTSiftData from '../data/HTSiftData.json';
 
 const {width, height} = Dimensions.get('window')
 
@@ -26,11 +31,15 @@ export default class GDHt extends React.Component {
     static navigationOptions = {
         tabBarLabel: '海淘',
         // Note: By default the icon is only shown on iOS. Search the showIcon option below.
-        tabBarIcon: ({ tintColor }) => (
-            <Image
-                source={require('../../assest/tabbar_abroad_30x30.png')}
-                style={[styles.icon, {tintColor: tintColor}]}
-            />
+        tabBarIcon: ({ tintColor,focused }) => (
+            <View>
+                <Image
+                    source={require('../../assest/tabbar_abroad_30x30.png')}
+                    style={[styles.icon, {tintColor: tintColor}]}
+                />
+
+                <TabBadge tabType={1} focused={focused}/>
+            </View>
         ),
     };
     constructor(props){
@@ -39,8 +48,10 @@ export default class GDHt extends React.Component {
             dataSource: [],
             loaded: false,
             isRefreshing: false,
-            isModal: false,
+            isHFModal: false,
+            isSiftModal: false,
             uslastID: 0,
+            htBadgeNum: 20
         };
     }
 
@@ -48,7 +59,7 @@ export default class GDHt extends React.Component {
         // this.props.navigation.navigate('GDUSHalfHourList');
 
         this.setState({
-            isModal: true
+            isHFModal: true
         })
     }
 
@@ -64,9 +75,16 @@ export default class GDHt extends React.Component {
         );
     };
 
+    //显示筛选菜单
+    showSiftMenu = () => {
+        this.setState({
+            isSiftModal: true,
+        })
+    }
+
     renderMidItem(){
         return(
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => {this.showSiftMenu()}}>
                 <Image source = {require('../../assest/navtitle_home_down_66x20.png')} style={styles.midNavStyle}/>
             </TouchableOpacity>
         );
@@ -89,6 +107,8 @@ export default class GDHt extends React.Component {
         HTTPBase.post('https://guangdiu.com/api/getlist.php',params,{})
             .then((responseData) => {
                 // this.dataSource = this.state.dataSource.concat(responseData.data);
+
+                DeviceEventEmitter.emit('htBadge',this.state.htBadgeNum++);
 
                 this.setState({
                     dataSource: responseData.data.slice(0),
@@ -126,6 +146,49 @@ export default class GDHt extends React.Component {
         // });
         alert('_refresh');
         this.fetchData();
+    }
+
+
+    // 加载筛选数据网络请求
+    loadSiftData = (mall, cate) => {
+
+        // 初始化参数对象
+        let params = {};
+
+        if (mall === "" && cate === "") {   // 全部
+            this.loadData(undefined);
+            return;
+        }
+
+        if (mall === "") {  // cate 有值
+            params = {
+                "cate" : cate,
+                "country" : "us"
+            };
+        }else {
+            params = {
+                "mall" : mall,
+                "country" : "us"
+            };
+        }
+
+        // 筛选请求
+        HTTPBase.get('https://guangdiu.com/api/getlist.php', params)
+            .then((responseData) => {
+                // 重新渲染
+                this.setState({
+                    dataSource: responseData.data.slice(0),
+                    loaded:true,
+                });
+
+                // 存储数组中最后一个元素的id
+                let cnlastID = responseData.data[responseData.data.length - 1].id;
+                AsyncStorage.setItem('cnlastID', cnlastID.toString());
+
+            })
+            .catch((error) => {
+                // 网络等问题处理
+            })
     }
 
     _loadMore = ()=>{
@@ -193,27 +256,43 @@ export default class GDHt extends React.Component {
 
     onRequestClose(){
         this.setState({
-            isModal: false
+            isHFModal: false,
+            isSiftModal: false,
         })
     }
 
     closeModal(data){
         this.setState({
-            isModal: data
+            isHFModal: data,
+            isSiftModal: data,
         })
     }
 
     render() {
         return (
             <View style = {styles.container} >
+                {/*初始化半小时热门*/}
                 <Modal
                     animationType = 'slide'
                     transparent= {false}
-                    visible= {this.state.isModal}
+                    visible= {this.state.isHFModal}
                     onRequestClose={() => this.onRequestClose()}
                 >
                     <GDUSHalfHourList removeModal = {(data) => this.closeModal(data)}/>
                 </Modal>
+
+                {/*初始化筛选菜单*/}
+                <Modal animationType = 'none'
+                       transparent= {true}
+                       visible= {this.state.isSiftModal}
+                       onRequestClose={() => this.onRequestClose()}
+                >
+                    <GDSiftMenu removeModal={(data) => this.closeModal(data)}
+                                data={HTSiftData}
+                                loadSiftData={(mall, cate) => this.loadSiftData(mall, cate)} />
+                </Modal>
+
+
                 <GDCommonNavBar leftItem={()=>this.renderLeftItem()}
                                 midItem={()=>this.renderMidItem()}
                                 rightItem={()=>this.renderRightItem()}

@@ -43,7 +43,6 @@ export default class GDHomeCell extends React.Component {
 
 
     getDateTime(pubTime,fromSite){
-        console.log(Date.parse(pubTime.replace(/-/gi,"/")));
 
         let minute = 1000*60;
         let hour = minute*60;
