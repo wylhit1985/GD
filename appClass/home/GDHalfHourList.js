@@ -30,7 +30,7 @@ export default class GDHalfHourList extends React.Component {
     }
 
     static defaultProps = {
-        removeModal: {}
+        // removeModal: {}
     }
 
     renderMidItem(){
@@ -40,9 +40,9 @@ export default class GDHalfHourList extends React.Component {
     }
 
     renderRightItem(){
-        //()=>this.props.navigation.goBack()
+        //() => {this.props.removeModal(false)}
         return(
-            <TouchableOpacity onPress={() => {this.props.removeModal(false)}}>
+            <TouchableOpacity onPress={()=>this.props.navigation.goBack()}>
                 <Text style={styles.rightNavStyle}> 关闭 </Text>
             </TouchableOpacity>
         );

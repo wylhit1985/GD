@@ -30,6 +30,8 @@ import HomeSiftData from '../data/HomeSiftData.json';
 
 const {width, height} = Dimensions.get('window')
 
+// let cnbadgeNum = 0;
+// let usbadgeNum = 0;
 
 export default class GDHome extends React.Component {
 
@@ -42,7 +44,6 @@ export default class GDHome extends React.Component {
             isModal: false,
             isSiftModal: false,
             cnlastID: 0,
-            homeBadgeNum: 100
         };
     }
 
@@ -55,11 +56,10 @@ export default class GDHome extends React.Component {
     static navigationOptions = {
         tabBarLabel: '首页',
         tabBarIcon: ({ tintColor,focused }) => (
-
             <View>
                 <Image
-                    source={{uri:'tabbar_home_30x30'}}
                     style={[styles.icon, {tintColor: tintColor}]}
+                    source={{uri:'tabbar_home_30x30'}}
                 >
                 </Image>
                 <TabBadge tabType={0} focused={focused}/>
@@ -82,7 +82,7 @@ export default class GDHome extends React.Component {
         // })
     }
 
-    pushSearch(){
+    pushSearch= () => {
         this.props.navigation.navigate('GDSearch');
     }
 
@@ -94,11 +94,6 @@ export default class GDHome extends React.Component {
         );
     };
 
-    showID(){
-        AsyncStorage.getItem("cnlastID").then((value) =>{
-            alert(value);
-        })
-    }
     //显示筛选菜单
     showSiftMenu = ()=>{
         this.setState({
@@ -129,8 +124,8 @@ export default class GDHome extends React.Component {
         HTTPBase.post('https://guangdiu.com/api/getlist.php',params,{})
             .then((responseData) => {
 
-                DeviceEventEmitter.emit('homeBadge',this.state.homeBadgeNum--);
-                this.dataSource = [];
+                // DeviceEventEmitter.emit('homeBadge',this.state.homeBadgeNum--);
+                this.state.dataSource = [];
 
                 this.setState({
                     dataSource: responseData.data.slice(0),
@@ -144,6 +139,10 @@ export default class GDHome extends React.Component {
                 AsyncStorage.setItem("cnlastID", cnlastID.toString());
                 console.log(cnlastID);
 
+                // 存储数组中第一个元素的id
+                let cnfirstID = responseData.data[0].id;
+                AsyncStorage.setItem('cnfirstID', cnfirstID.toString());
+
                 RealmStorage.create('HomeData',responseData.date = {});
             }).catch((error)=>{
             // alert(error);
@@ -156,6 +155,33 @@ export default class GDHome extends React.Component {
             // })
 
         }).done();
+    }
+
+    // 获取最新数据个数网络请求
+    loadDataNumber() {
+        // 取出id
+        AsyncStorage.multiGet(['cnfirstID', 'usfirstID'], (error, stores) => {
+            // 拼接参数
+            let params = {
+                "cnmaxid" : stores[0][1],
+                "usmaxid" : stores[1][1],
+            };
+
+            // 请求数据
+            HTTPBase.get('http://guangdiu.com/api/getnewitemcount.php', params)
+                .then((responseData) => {
+                    DeviceEventEmitter.emit('homeBadge',parseInt(responseData.cn));
+                    DeviceEventEmitter.emit('htBadge',parseInt(responseData.us));
+
+                    // this.setState({
+                    //     cnbadgeNum: parseInt(responseData.cn),
+                    //     usbadgeNum: parseInt(responseData.us)
+                    // })
+                })
+                .catch((error) => {
+
+                })
+        });
     }
 
     _openDetail = (value) => {
@@ -239,7 +265,7 @@ export default class GDHome extends React.Component {
 
             HTTPBase.post('https://guangdiu.com/api/getlist.php',params,{})
                 .then((responseData) => {
-                    this.dataSource = this.state.dataSource.concat(responseData.data);
+                    this.state.dataSource = this.state.dataSource.concat(responseData.data);
                     this.setState({
                         // dataSource:responseData.data.slice(0),
                         loaded: true,
@@ -281,8 +307,13 @@ export default class GDHome extends React.Component {
             ()=>{
                 this.fetchData();
             },
-            1000,
+            0,
         );
+
+        // 最新数据的个数
+        setInterval(() => {
+            this.loadDataNumber();
+        }, 1000*30);
     }
 
     componentWillUnmount() {
@@ -342,9 +373,9 @@ export default class GDHome extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
+        flex: 1,
         alignItems: 'center',
-        backgroundColor: '#95e9de',
+        backgroundColor: '#1e1de9',
     },
     icon: {
         top:5,

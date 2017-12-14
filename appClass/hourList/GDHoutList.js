@@ -27,11 +27,7 @@ import RealmStorage from '../storage/RealmStorage';
 const {width, height} = Dimensions.get('window')
 
 export default class GDHoutList extends React.Component {
-    _renderBadge = ()=>{
-        return(
-            <GDBadge num={this.state.badgeNum}/>
-        );
-    }
+
     constructor(props){
         super(props);
         this.state = {
@@ -77,7 +73,6 @@ export default class GDHoutList extends React.Component {
         this.props.navigation.navigate('GDSettings');
 
 
-        // alert(curDate);
     }
 
     getCurDate = ()=>{
@@ -256,7 +251,7 @@ export default class GDHoutList extends React.Component {
                         data={this.state.dataSource}
                         keyExtractor = {(item,index) => item.id}
                         renderItem = {this._renderItem}
-                        onRefresh = {this._refresh}
+                        // onRefresh = {this._refresh}
                         refreshing = {false}
                         ListEmptyComponent = {<GDNoDataView infoText = '加载失败，请重试' style={styles.noData}/>}
                     >
@@ -308,9 +303,6 @@ export default class GDHoutList extends React.Component {
                     </TouchableOpacity>
                 </View>
 
-                {
-                    this._renderBadge()
-                }
             </View>
         );
     }

@@ -122,7 +122,7 @@ export default class GDUSHalfHourList extends React.Component {
                     onRefresh = {this._refresh}
                     refreshing = {false}
                     ListEmptyComponent = {<GDNoDataView infoText = '加载失败，请重试' style={styles.noData}/>}
-                    onEndReachedThreshold={0.5}
+                    onEndReachedThreshold={0.2}
                     onEndReached={this._loadMore}
                 >
                 </FlatList>

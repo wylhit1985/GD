@@ -123,13 +123,13 @@ const styles = StyleSheet.create({
         flexWrap:'wrap',
         width: width,
         top:Platform.OS === 'ios' ? 54 : 44,
-        backgroundColor:'green'
+        backgroundColor:'gray'
     },
 
     itemViewStyle: {
         width:width * 0.25,
         height:70,
-        backgroundColor:'rgba(249,249,249,1.0)',
+        backgroundColor:'rgba(0,249,249,1.0)',
         justifyContent:'center',
         alignItems:'center'
     },

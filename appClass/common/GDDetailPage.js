@@ -27,7 +27,7 @@ export default class GDDetailPage extends Component{
 
     render(){
         const { params } = this.props.navigation.state;
-        alert(params.url);
+        // alert(params.url);
         return(
             <View style={styles.container}>
                 <GDCommonNavBar

@@ -79,7 +79,12 @@ export default class GDHomeCell extends React.Component {
             result = "刚刚";
         }
 
-        return result + ' · ' + fromSite;
+        // alert(fromSite);
+        let tmp = result;
+        if(fromSite !== ''){
+            tmp = result + ' · ' + fromSite;
+        }
+        return tmp;
     }
 
     render() {

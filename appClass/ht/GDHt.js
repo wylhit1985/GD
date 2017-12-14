@@ -17,6 +17,7 @@ import GDCommonNavBar from '../common/GDCommonNavBar';
 import GDUSHalfHourList from './GDUSHalfHourList';
 import GDSearch from '../search/GDSearch';
 import GDHotCell from '../common/GDHotCell';
+import GDHomeCell from '../common/GDHomeCell';
 import GDNoDataView from '../common/GDNoDataView';
 import HTTPBase from '../http/HTTPBase';
 import TabBadge from '../common/TabBadge';
@@ -106,9 +107,9 @@ export default class GDHt extends React.Component {
 
         HTTPBase.post('https://guangdiu.com/api/getlist.php',params,{})
             .then((responseData) => {
-                // this.dataSource = this.state.dataSource.concat(responseData.data);
+                this.state.dataSource = [];
 
-                DeviceEventEmitter.emit('htBadge',this.state.htBadgeNum++);
+                // DeviceEventEmitter.emit('htBadge',this.state.htBadgeNum++);
 
                 this.setState({
                     dataSource: responseData.data.slice(0),
@@ -121,6 +122,11 @@ export default class GDHt extends React.Component {
                 uslastID = responseData.data[responseData.data.length - 1].id;
                 AsyncStorage.setItem("uslastID", uslastID.toString());
                 console.log(uslastID);
+
+                // 存储数组中第一个元素的id
+                let usfirstID = responseData.data[0].id;
+                AsyncStorage.setItem('usfirstID', usfirstID.toString());
+
             }).catch((error)=>{alert(error);}).done();
     }
 
@@ -133,9 +139,16 @@ export default class GDHt extends React.Component {
             <TouchableOpacity onPress={() => {
                 this._openDetail(rowData.item.id)
             }}>
-                <GDHotCell
+                {/*<GDHotCell*/}
+                    {/*image={rowData.item.image}*/}
+                    {/*title={rowData.item.title}*/}
+                {/*/>*/}
+                <GDHomeCell
                     image={rowData.item.image}
                     title={rowData.item.title}
+                    mall={rowData.item.mall}
+                    pubTime={rowData.item.pubtime}
+                    fromSite={rowData.item.fromsite}
                 />
             </TouchableOpacity>
         );
@@ -144,7 +157,6 @@ export default class GDHt extends React.Component {
         // this.setState({
         //     isRefreshing: true,
         // });
-        alert('_refresh');
         this.fetchData();
     }
 
@@ -205,7 +217,7 @@ export default class GDHt extends React.Component {
 
             HTTPBase.post('https://guangdiu.com/api/getlist.php',params,{})
                 .then((responseData) => {
-                    this.dataSource = this.state.dataSource.concat(responseData.data);
+                    this.state.dataSource = this.state.dataSource.concat(responseData.data);
                     this.setState({
                         // dataSource:responseData.data.slice(0),
                         loaded: true,
@@ -246,7 +258,7 @@ export default class GDHt extends React.Component {
             ()=>{
                 this.fetchData();
             },
-            1000,
+            0,
         );
     }
 
