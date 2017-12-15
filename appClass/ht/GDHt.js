@@ -10,7 +10,8 @@ import {
     Dimensions,
     Modal,
     AsyncStorage,
-    DeviceEventEmitter
+    DeviceEventEmitter,
+    Platform
 } from 'react-native';
 
 import GDCommonNavBar from '../common/GDCommonNavBar';
@@ -360,6 +361,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#e96ddb',
     },
     icon: {
+        top: Platform.OS === 'ios' ? 5 : 0,
         width: 26,
         height: 26,
     },

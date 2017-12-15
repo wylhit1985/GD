@@ -54,6 +54,7 @@ export default class HTTPBase{
     static post(url, params, headers){
         //初始化 FormData
         let formData = new FormData();
+        formData.append("key_","value_");//不加此行，安卓报错
 
         if(params){
             //获取 params 内所有的 key
@@ -61,6 +62,8 @@ export default class HTTPBase{
 
             //通过 foreach 方法拿到数组中每个元素，将元素与参数的值进行拼接处理，并且放入 paramsArray 中
             paramsKeyArray.forEach(key => formData.append(key,params[key]));
+        }else{
+            alert(url);
         }
 
         return new Promise((resolve, reject) => {

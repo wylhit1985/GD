@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import { StyleSheet,View,Text,Easing,Animated } from 'react-native';
+import {
+    StyleSheet,
+    View,
+    Text,
+    Easing,
+    Animated,
+    Platform,
+} from 'react-native';
 import { StackNavigator, TabNavigator } from 'react-navigation';
 
 import GDLaunchPage from './appClass/common/GDLaunchPage';
@@ -42,6 +49,16 @@ const TabRouters = TabNavigator(
         animationEnabled: true,
         tabBarOptions: {
             activeTintColor: '#000ce9',
+            inactiveTintColor: '#AAAAAA',
+            labelStyle:{
+                fontSize:12,
+                bottom:Platform.OS === 'ios' ? 0 : 5,
+            },
+            style: {
+                height: 50,
+                backgroundColor: '#F7F7F7',
+            },
+            showIcon: true,
         },
     }
 );

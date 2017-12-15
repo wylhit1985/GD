@@ -234,7 +234,7 @@ export default class GDHoutList extends React.Component {
         let top = Platform.OS === 'ios' ? 54 : 44;
         let title = 44;
         let bottom = 44;
-        let tabH = 44;
+        let tabH = 44 + 50;
         let h = height - top - title - bottom - tabH;
         return h;
     }
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
     },
     icon: {
-        top:5,
+        top: Platform.OS === 'ios' ? 5 : 0,
         width: 26,
         height: 26,
     },

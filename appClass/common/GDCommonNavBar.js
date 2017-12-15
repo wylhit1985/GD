@@ -76,10 +76,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderBottomWidth: 0.5,
         borderBottomColor: 'gray',
-        paddingTop:15,
-    },
-    icon: {
-        width: 26,
-        height: 26,
+        paddingTop:Platform.OS === 'ios' ? 15 : 0,
     },
 });

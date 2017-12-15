@@ -10,7 +10,8 @@ import {
     Dimensions,
     Modal,
     AsyncStorage,
-    DeviceEventEmitter
+    DeviceEventEmitter,
+    Platform
 } from 'react-native';
 
 import ReactPropTypes from 'prop-types';
@@ -189,7 +190,7 @@ export default class GDHome extends React.Component {
         AsyncStorage.multiGet(['cnfirstID', 'usfirstID'], (error, stores) => {
             // 拼接参数
             let params = {
-                "cnmaxid" : stores[0][1],
+                "cnmaxid" : 5,//stores[0][1],
                 "usmaxid" : stores[1][1],
             };
 
@@ -234,6 +235,7 @@ export default class GDHome extends React.Component {
         // });
         // alert('_refresh');
         this.fetchData();
+
 
         this.timerNum = setTimeout(
             ()=>{
@@ -342,6 +344,8 @@ export default class GDHome extends React.Component {
             0,
         );
 
+        this.refreshRedNumber();
+
         // 最新数据的个数
         setInterval(() => {
             this.loadDataNumber();
@@ -411,15 +415,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#1e1de9',
     },
     icon: {
-        top:5,
+        top: Platform.OS === 'ios' ? 5 : 0,
         width: 26,
         height: 26,
-    },
-    icon2: {
-        position:'absolute',
-        top:5,
-        width: 9,
-        height: 9,
     },
     badgeStyle: {
         // position:'absolute',
@@ -434,11 +432,6 @@ const styles = StyleSheet.create({
         borderRadius:3,
         width: 15,
         height: 13,
-    },
-    badgeText: {
-        position:'absolute',
-        top:0,
-        left:20,
     },
     leftNavStyle: {
         width: 20,
