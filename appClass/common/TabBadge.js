@@ -113,5 +113,6 @@ const styles = StyleSheet.create({
         fontSize:12,
         bottom:25,
         left:25,
+        color:'white',
     }
 });

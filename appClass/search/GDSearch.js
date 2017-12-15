@@ -46,7 +46,7 @@ export default class GDSearch extends React.Component {
         return(
             <TouchableOpacity onPress={()=>this.props.navigation.goBack()}>
                 <View style={{flexDirection:'row', alignItems:'center'}}>
-                    <Image source={require('../../assest/back.png')} style={styles.leftNavStyle} />
+                    <Image source={{uri:'back'}} style={styles.leftNavStyle} />
                     <Text>返回</Text>
                 </View>
             </TouchableOpacity>
@@ -177,7 +177,7 @@ export default class GDSearch extends React.Component {
                     <View style={styles.toolsViewStyle}>
                         {/*左边输入框*/}
                         <View style={styles.inputViewStyle}>
-                            <Image source={require('../../assest/search_icon_20x20.png')} style={styles.searchImageStyle}/>
+                            <Image source={{uri:'search_icon_20x20'}} style={styles.searchImageStyle}/>
                             <TextInput
                                 style={styles.textInputStyle}
                                 keyboardType="default"

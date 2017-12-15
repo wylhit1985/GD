@@ -7,7 +7,7 @@ export default class TabProfileScreen extends React.Component {
         tabBarLabel: '说明',
         tabBarIcon: ({ tintColor }) => (
             <Image
-                source={require('../../assest/arrow-expand.png')}
+                source={{uri:'arrow-expand'}}
                 style={[styles.icon, {tintColor: tintColor}]}
             />
         ),

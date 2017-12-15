@@ -42,7 +42,7 @@ export default class GDLaunchPage extends React.Component{
     render(){
         return(
             <View>
-                <Image source={require('../../assest/launchimage.png')} style={styles.imageStyle}/>
+                <Image source={{uri:'launchimage'}} style={styles.imageStyle}/>
             </View>
         );
     }

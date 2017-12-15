@@ -56,7 +56,7 @@ export default class GDHoutList extends React.Component {
         tabBarIcon: ({ tintColor }) => (
             <View>
                 <Image
-                    source={require('../../assest/tabbar_rank_30x30.png')}
+                    source={{uri:'tabbar_rank_30x30'}}
                     style={[styles.icon, {tintColor: tintColor}]}
                 >
                 </Image>
@@ -105,7 +105,7 @@ export default class GDHoutList extends React.Component {
 
     renderMidItem(){
         return(
-            <Image source = {require('../../assest/navtitle_rank_107x20.png')} style={styles.midNavStyle}/>
+            <Image source = {{uri:'navtitle_rank_107x20'}} style={styles.midNavStyle}/>
         );
     }
 

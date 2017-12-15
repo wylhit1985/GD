@@ -89,7 +89,7 @@ export default class GDHome extends React.Component {
     renderLeftItem(){
         return(
             <TouchableOpacity onPress={()=>this.pushToHalfHourList()}>
-                <Image source = {require('../../assest/hot_icon_20x20.png')} style={styles.leftNavStyle}/>
+                <Image source = {{uri:'hot_icon_20x20'}} style={styles.leftNavStyle}/>
             </TouchableOpacity>
         );
     };
@@ -104,7 +104,7 @@ export default class GDHome extends React.Component {
     renderMidItem(){
         return(
             <TouchableOpacity onPress={() => {this.showSiftMenu()}}>
-                <Image source = {require('../../assest/navtitle_home_down_66x20.png')} style={styles.midNavStyle}/>
+                <Image source = {{uri:'navtitle_home_down_66x20'}} style={styles.midNavStyle}/>
             </TouchableOpacity>
         );
     }
@@ -112,7 +112,7 @@ export default class GDHome extends React.Component {
     renderRightItem(){
         return(
             <TouchableOpacity onPress={() => this.pushSearch()}>
-                <Image source = {require('../../assest/search_icon_20x20.png')} style={styles.rightNavStyle}/>
+                <Image source = {{uri:'search_icon_20x20'}} style={styles.rightNavStyle}/>
             </TouchableOpacity>
         );
     }
@@ -183,6 +183,31 @@ export default class GDHome extends React.Component {
                 })
         });
     }
+    // 获取最新数据个数网络请求
+    refreshRedNumber() {
+        // 取出id
+        AsyncStorage.multiGet(['cnfirstID', 'usfirstID'], (error, stores) => {
+            // 拼接参数
+            let params = {
+                "cnmaxid" : stores[0][1],
+                "usmaxid" : stores[1][1],
+            };
+
+            // 请求数据
+            HTTPBase.get('http://guangdiu.com/api/getnewitemcount.php', params)
+                .then((responseData) => {
+                    DeviceEventEmitter.emit('homeBadge',parseInt(responseData.cn));
+
+                    // this.setState({
+                    //     cnbadgeNum: parseInt(responseData.cn),
+                    //     usbadgeNum: parseInt(responseData.us)
+                    // })
+                })
+                .catch((error) => {
+
+                })
+        });
+    }
 
     _openDetail = (value) => {
         this.props.navigation.navigate('GDDetailPage', {url: 'http://guangdiu.com/go.php' + '?' + 'id=' + value});
@@ -209,6 +234,13 @@ export default class GDHome extends React.Component {
         // });
         // alert('_refresh');
         this.fetchData();
+
+        this.timerNum = setTimeout(
+            ()=>{
+                this.refreshRedNumber();
+            },
+            1000,
+        );
     }
 
 
@@ -318,6 +350,7 @@ export default class GDHome extends React.Component {
 
     componentWillUnmount() {
         this.timer && clearTimeout(this.timer);
+        this.timerNum && clearTimeout(this.timerNum);
     }
 
     onRequestClose(){

@@ -7,7 +7,7 @@ export default class DrawerMainScreen extends Component {
         tabBarLabel: '主页',
         tabBarIcon: ({ tintColor }) => (
             <Image
-                source={require('../../assest/android-user-menu.png')}
+                source={{uri:'android-user-menu'}}
                 style={[styles.icon, {tintColor: tintColor}]}
             />
         ),

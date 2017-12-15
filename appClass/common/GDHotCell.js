@@ -23,18 +23,12 @@ export default class GDHotCell extends React.Component {
     renderImage(){
         if(this.props.image === ''){
             var tmp={
-                src:require('../../assest/defaullt_thumb_250x250.png'),
+                src:{uri:'defaullt_thumb_250x250'},
             };
-            // return(
-            //    <Image source={require('../../assest/defaullt_thumb_250x250.png')} style={styles.imageStyle}/>
-            // );
         }else{
             var tmp={
                 src:{uri:this.props.image},
             };
-            // return(
-            //     <Image source={{uri:this.props.image}} style={styles.imageStyle}/>
-            // );
         }
         return tmp.src;
     }
@@ -46,7 +40,7 @@ export default class GDHotCell extends React.Component {
                 <View>
                     <Text numberOfLines={3} style={styles.titleStyle}>{this.props.title}</Text>
                 </View>
-                <Image source={require('../../assest/icon_cell_rightarrow.png')} style={styles.arrowStyle}/>
+                <Image source={{uri:'icon_cell_rightarrow'}} style={styles.arrowStyle}/>
             </View>
         );
     }

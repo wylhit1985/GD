@@ -37,7 +37,7 @@ export default class GDSettingsCell extends Component {
 
             component = <Switch value={this.state.isOn} onValueChange={() => {this.setState({isOn: !this.state.isOn})}} />
         }else {
-            component = <Image source={require('../../assest/icon_cell_rightarrow.png')} style={styles.arrowStyle} />
+            component = <Image source={{uri:'icon_cell_rightarrow'}} style={styles.arrowStyle} />
         }
 
         return(

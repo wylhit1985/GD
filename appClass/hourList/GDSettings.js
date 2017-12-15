@@ -37,7 +37,7 @@ export default class GDSettings extends Component {
                 onPress={() => {this.pop()}}
             >
                 <View style={{flexDirection:'row', alignItems:'center'}}>
-                    <Image source={require('../../assest/back.png')} style={styles.navbarLeftItemStyle} />
+                    <Image source={{uri:'back'}} style={styles.navbarLeftItemStyle} />
                     <Text>返回</Text>
                 </View>
 
