@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
         color:'gray'
     },
     titleStyle:{
-        width: width*0.60,
+        width: width-(15*2+70+16+15*2),//左边距*2 + 图片宽度 + 箭头宽度 + 右边距*2
     },
 
     arrowStyle: {

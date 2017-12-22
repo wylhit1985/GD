@@ -40,25 +40,25 @@ export default class Share extends React.Component {
     }
     sinashare = () => {
         // alert('ok');
-        ShareUtil.share('sssss','http://dev.umeng.com/images/tab2_1.png','http://www.umeng.com/','title',1,(code,message) =>{
+        ShareUtil.share('国内国外随便逛','http://dev.umeng.com/images/tab2_1.png','http://www.baidu.com/','爱逛街',1,(code,message) =>{
             this.setState({result:message});
         });
     }
     qqshare = () => {
-        ShareUtil.share('sssss','http://dev.umeng.com/images/tab2_1.png','http://www.umeng.com/','title',0,(code,message) =>{
+        ShareUtil.share('国内国外随便逛','http://dev.umeng.com/images/tab2_1.png','http://www.baidu.com/','爱逛街',0,(code,message) =>{
             this.setState({result:message});
 
         });
     }
     wxshare = () => {
-        ShareUtil.share('sssss','http://dev.umeng.com/images/tab2_1.png','http://www.umeng.com/','title',2,(code,message) =>{
+        ShareUtil.share('国内国外随便逛','http://dev.umeng.com/images/tab2_1.png','http://www.baidu.com/','爱逛街',2,(code,message) =>{
             this.setState({result:message});
 
         });
     }
     shareboard = () => {
         var list = [0,1,2]
-        ShareUtil.shareboard('sssss','http://dev.umeng.com/images/tab2_1.png','http://www.umeng.com/','title',list,(code,message) =>{
+        ShareUtil.shareboard('国内国外随便逛','http://dev.umeng.com/images/tab2_1.png','http://www.baidu.com/','爱逛街',list,(code,message) =>{
             this.setState({result:message});
 
         });
