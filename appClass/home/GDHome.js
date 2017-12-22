@@ -24,6 +24,7 @@ import GDNoDataView from '../common/GDNoDataView';
 import GDDetailPage from '../common/GDDetailPage';
 import GDBadge from '../common/GDBadge';
 import TabBadge from '../common/TabBadge';
+import HomeTabBadge from '../common/HomeTabBadge';
 import RealmStorage from '../storage/RealmStorage';
 import GDSiftMenu from '../common/GDSiftMenu';
 
@@ -56,7 +57,11 @@ export default class GDHome extends React.Component {
     }
     static navigationOptions = {
         tabBarLabel: '首页',
-        tabBarIcon: ({ tintColor,focused }) => (
+        tabBarIcon: ({ tintColor,focused }) => {
+            return(
+                <HomeTabBadge tabType={0} focused={focused}/>
+            );
+            /*
             <View>
                 <Image
                     style={[styles.icon, {tintColor: tintColor}]}
@@ -65,15 +70,9 @@ export default class GDHome extends React.Component {
                 </Image>
                 <TabBadge tabType={0} focused={focused}/>
             </View>
-
-        ),
+            */
+        },
     };
-
-
-
-// <GDBadge num={99}/>
-// {/*<View style={styles.badgeColor} ></View>*/}
-
 
     pushToHalfHourList(){
         this.props.navigation.navigate('GDHalfHourList');
@@ -190,7 +189,7 @@ export default class GDHome extends React.Component {
         AsyncStorage.multiGet(['cnfirstID', 'usfirstID'], (error, stores) => {
             // 拼接参数
             let params = {
-                "cnmaxid" : 5,//stores[0][1],
+                "cnmaxid" : stores[0][1],
                 "usmaxid" : stores[1][1],
             };
 
@@ -418,20 +417,6 @@ const styles = StyleSheet.create({
         top: Platform.OS === 'ios' ? 5 : 0,
         width: 26,
         height: 26,
-    },
-    badgeStyle: {
-        // position:'absolute',
-        // top:2,
-        // left:20
-    },
-    badgeColor: {
-        position:'absolute',
-        top:2,
-        left:20,
-        backgroundColor: '#2489e9',
-        borderRadius:3,
-        width: 15,
-        height: 13,
     },
     leftNavStyle: {
         width: 20,

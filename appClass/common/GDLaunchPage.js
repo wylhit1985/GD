@@ -50,7 +50,7 @@ export default class GDLaunchPage extends React.Component{
 
 const styles = StyleSheet.create({
     imageStyle:{
-        width: width,
-        height: height,
+        width:width,
+        height:height,
     }
 });

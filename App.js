@@ -19,6 +19,7 @@ import Main from './appClass/main/Main';
 import GDHome from './appClass/home/GDHome';
 import GDHt from './appClass/ht/GDHt';
 import GDHourList from './appClass/hourList/GDHoutList';
+import Share from './appClass/share/Share';
 
 import CardStackStyleInterpolator from 'react-navigation/src/views/CardStack/CardStackStyleInterpolator';
 
@@ -43,6 +44,10 @@ const TabRouters = TabNavigator(
         GDHourList: {
             screen: GDHourList,
         },
+        Share: {
+            screen: Share,
+        }
+
     },
     {
         tabBarPosition: 'bottom',
@@ -59,6 +64,9 @@ const TabRouters = TabNavigator(
                 backgroundColor: '#F7F7F7',
             },
             showIcon: true,
+            indicatorStyle:{
+                height:0,
+            }
         },
     }
 );

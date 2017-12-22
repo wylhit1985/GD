@@ -14,7 +14,7 @@ import ReactPropTypes from 'prop-types';
 
 const {width, height} = Dimensions.get('window')
 
-export default class FocusedTabBadge extends React.Component {
+export default class TabBadge extends React.Component {
     static propTypes = {
         tabType:ReactPropTypes.number,//0-首页，1-海淘
         focused:ReactPropTypes.bool,
@@ -34,18 +34,20 @@ export default class FocusedTabBadge extends React.Component {
     }
 
     renderjBadge = () => {
-        if(this.props.tabType == 0){
-            if(this.state.homeNumber == 0){
+        if(this.props.tabType == 0){//首页
+            if(this.state.homeNumber == -1){
                 return null;
             }else{
+                this.state.homeNumber = 99;
                 return(
                     <View>
-                        <View style={[styles.badgeColor,{backgroundColor: this.props.focused ? 'red' : 'gray'},{opacity:this.props.focused ? 1.0 : 0.5}, {width: this.state.homeNumber < 10 ? 12 : 18}]} ></View>
+                        {/*<View style={[styles.badgeColor,{backgroundColor: this.props.focused ? 'red' : 'gray'},{opacity:this.props.focused ? 1.0 : 0.5}, {width: this.state.homeNumber < 10 ? 12 : 18}]} ></View>*/}
                         <Text style={styles.badgeText}>{this.state.homeNumber}</Text>
+                        {/*<Image source={{uri:'tabbar_abroad_30x30'}} style={styles.badgeImage}/>*/}
                     </View>
                 );
             }
-        }else{
+        }else{//海淘
             if(this.state.htNumber == 0){
                 return null;
             }else{
@@ -103,16 +105,30 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     badgeColor: {
-        position:'absolute',
+        position:'absolute',//25,23
         bottom:25,
         left:23,
         borderRadius:5,
         height: 14,
     },
     badgeText: {
+        position:'absolute',
         fontSize:12,
-        bottom:25,
-        left:25,
-        color:'white',
+        bottom:8,
+        left:15,
+        color:'red',
+    },
+    badgeImage: {
+        // position:'absolute',
+        width:25,
+        height:25,
     }
 });
+
+// badgeText: {
+//     // position:'absolute',
+//     fontSize:12,
+//         bottom:25,
+//         left:25,
+//         color:'red',
+// },
