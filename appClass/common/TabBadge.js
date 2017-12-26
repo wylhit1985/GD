@@ -35,13 +35,13 @@ export default class TabBadge extends React.Component {
 
     renderjBadge = () => {
         if(this.props.tabType == 0){//首页
-            if(this.state.homeNumber == -1){
+            if(this.state.homeNumber == 0){
                 return null;
             }else{
-                this.state.homeNumber = 99;
+                // this.state.homeNumber = 99;
                 return(
                     <View>
-                        {/*<View style={[styles.badgeColor,{backgroundColor: this.props.focused ? 'red' : 'gray'},{opacity:this.props.focused ? 1.0 : 0.5}, {width: this.state.homeNumber < 10 ? 12 : 18}]} ></View>*/}
+                        <View style={[styles.badgeColor,{backgroundColor: this.props.focused ? 'red' : 'gray'},{opacity:this.props.focused ? 1.0 : 0.5}, {width: this.state.homeNumber < 10 ? 12 : 18}]} ></View>
                         <Text style={styles.badgeText}>{this.state.homeNumber}</Text>
                         {/*<Image source={{uri:'tabbar_abroad_30x30'}} style={styles.badgeImage}/>*/}
                     </View>
@@ -112,11 +112,11 @@ const styles = StyleSheet.create({
         height: 14,
     },
     badgeText: {
-        position:'absolute',
+        // position:'absolute',
         fontSize:12,
-        bottom:8,
-        left:15,
-        color:'red',
+        bottom:25,
+        left:25,
+        color:'white',
     },
     badgeImage: {
         // position:'absolute',
@@ -125,10 +125,3 @@ const styles = StyleSheet.create({
     }
 });
 
-// badgeText: {
-//     // position:'absolute',
-//     fontSize:12,
-//         bottom:25,
-//         left:25,
-//         color:'red',
-// },

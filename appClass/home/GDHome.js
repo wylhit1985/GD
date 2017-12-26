@@ -57,11 +57,11 @@ export default class GDHome extends React.Component {
     }
     static navigationOptions = {
         tabBarLabel: '首页',
-        tabBarIcon: ({ tintColor,focused }) => {
-            return(
-                <HomeTabBadge tabType={0} focused={focused}/>
-            );
-            /*
+        tabBarIcon: ({ tintColor,focused }) => (
+            // return(
+            //     <HomeTabBadge tabType={0} focused={focused}/>
+            // );
+
             <View>
                 <Image
                     style={[styles.icon, {tintColor: tintColor}]}
@@ -70,8 +70,7 @@ export default class GDHome extends React.Component {
                 </Image>
                 <TabBadge tabType={0} focused={focused}/>
             </View>
-            */
-        },
+        ),
     };
 
     pushToHalfHourList(){
